@@ -12,6 +12,7 @@ import Signup from './pages/Signup';
 function App() {
   return (
     <Router>
+      {/* Triggering Vercel Build */}
       <div className="d-flex flex-column min-vh-100">
         <Navbar />
         <main className="flex-grow-1">
