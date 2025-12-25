@@ -11,7 +11,7 @@ function Contact() {
   }
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:5000/contact', values)
+    axios.post('https://healthtrack-67vp.onrender.com/contact', values)
       .then(res => {
         if(res.data === "Success") {
             alert("Message Sent Successfully!");

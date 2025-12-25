@@ -18,7 +18,7 @@ function Tracker() {
     if (!user) {
       navigate('/login');
     } else {
-      axios.get('http://localhost:5000/api/activities')
+      axios.get('https://healthtrack-67vp.onrender.com/activities')
         .then(res => {
           setEntries(res.data);
         })

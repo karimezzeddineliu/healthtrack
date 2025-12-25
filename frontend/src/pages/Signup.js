@@ -14,7 +14,7 @@ function Signup() {
   }
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:5000/api/signup', values)
+    axios.post('https://healthtrack-67vp.onrender.com/signup', values)
       .then(res => {
         alert('Signup successful! Please login.');
         navigate('/login');
@@ -30,7 +30,6 @@ function Signup() {
         <div className="col-md-5 fade-in">
           <div className="card fresh p-4">
             <h3 className="text-center mb-4">Create Account</h3>
-            {}
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
