@@ -5,32 +5,38 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "healthtrack_db"
+    host: "brmpwfkc4x8qy8uhgdz7-mysql.services.clever-cloud.com",
+    user: "uj9kzdsptyokngrb",
+    password: "vWbNcy8lfyxqoViye1Tz",
+    database: "brmpwfkc4x8qy8uhgdz7",
+    port: 3306
 });
 db.connect((err) => {
     if (err) {
-        console.log("Error connecting to DB");
+        console.log("Error connecting to DB:", err);
     } else {
-        console.log("Connected to MySQL");
+        console.log("Connected to MySQL Cloud Database");
     }
 });
-app.post('/api/signup', (req, res) => {
-    const sql = "INSERT INTO users (`username`, `email`, `password`) VALUES (?)";
-    const values = [req.body.username, req.body.email, req.body.password];
+app.post('/signup', (req, res) => {
+    const sql = "INSERT INTO login (`name`, `email`, `password`) VALUES (?)";
+    const values = [req.body.name, req.body.email, req.body.password];
 
     db.query(sql, [values], (err, data) => {
-        if(err) return res.json("Error");
+        if(err) {
+            console.error(err);
+            return res.json("Error");
+        }
         return res.json("User registered");
     });
 });
-app.post('/api/login', (req, res) => {
-    const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-
+app.post('/login', (req, res) => {
+    const sql = "SELECT * FROM login WHERE email = ? AND password = ?";
     db.query(sql, [req.body.email, req.body.password], (err, data) => {
-        if(err) return res.json("Error");
+        if(err) {
+            console.error(err);
+            return res.json("Error");
+        }
         if(data.length > 0) {
             return res.json("Success");
         } else {
@@ -44,10 +50,10 @@ app.post('/contact', (req, res) => {
         req.body.name,
         req.body.email,
         req.body.message
-    ];
-    
+    ];  
     db.query(sql, [values], (err, data) => {
         if(err) {
+            console.error(err);
             return res.json("Error");
         }
         return res.json("Success");
@@ -88,6 +94,7 @@ app.delete('/api/activities/:id', (req, res) => {
         return res.json("Deleted");
     });
 });
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
