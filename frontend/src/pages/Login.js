@@ -13,24 +13,28 @@ function Login() {
   }
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('https://healthtrack-67vp.onrender.com/login', values)
+        axios.post('https://healthtrack-67vp.onrender.com/login', values)
       .then(res => {
+        alert("Backend said: " + JSON.stringify(res.data));
         if(res.data === "Success") {
             localStorage.setItem("user", JSON.stringify(values));
-            window.dispatchEvent(new Event("storage"));
+            window.dispatchEvent(new Event("storage")); 
             navigate('/tracker');
         } else {
             setError("Invalid Email or Password");
         }
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        setError("Error connecting to server");
+      });
   }
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-md-5 fade-in">
           <div className="card fresh p-4">
-            <h3 className="text-center mb-4">Welcome Back</h3>
+            <h3 className="text-center mb-4">Welcome Back</h3>  
             {}
             {error && <div className="alert alert-danger">{error}</div>}
 
