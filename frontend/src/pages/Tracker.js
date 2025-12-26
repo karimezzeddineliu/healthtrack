@@ -1,172 +1,127 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BsPencilSquare, BsTrash } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 function Tracker() {
-  const [entries, setEntries] = useState([]);
-  const [form, setForm] = useState({
-    id: null,
-    date: '',
-    type: 'Exercise',
-    val: '',
-    notes: ''
-  });
-  const [filter, setFilter] = useState('all');
-  const navigate = useNavigate();
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (!user) {
-      navigate('/login');
-    } else {
-      axios.get('https://healthtrack-67vp.onrender.com/activities')
-        .then(res => {
-          setEntries(res.data);
-        })
-        .catch(err => console.log(err));
-    }
-  }, [navigate]);
-  const handleInput = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-  const resetForm = () => {
-    setForm({ id: null, date: '', type: 'Exercise', val: '', notes: '' });
-  }
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!form.date || !form.val) return;
-    if (form.id) {
-      axios.put(`http://localhost:5000/api/activities/${form.id}`, form)
-        .then(res => {
-            window.location.reload();
-        })
-        .catch(err => console.log(err));
-    } else {
-      axios.post('http://localhost:5000/api/activities', form)
-        .then(res => {
-            window.location.reload();
-        })
-        .catch(err => console.log(err));
-    }
-  }
-  const handleEdit = (entry) => {
-    setForm({
-        id: entry.id,
-        date: entry.date.split('T')[0],
-        type: entry.type,
-        val: entry.val,
-        notes: entry.notes
+    const [activities, setActivities] = useState([]);
+    const [values, setValues] = useState({
+        date: new Date().toISOString().split('T')[0], // Default to today
+        type: 'Exercise',
+        val: '',
+        notes: ''
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-  const handleDelete = (id) => {
-    if (!window.confirm('Delete this entry?')) return;
-    axios.delete(`http://localhost:5000/api/activities/${id}`)
-      .then(res => {
-        setEntries(entries.filter(item => item.id !== id));
-      })
-      .catch(err => console.log(err));
-  }
-  const filtered = filter === 'all' ? entries : entries.filter(x => x.type === filter);
-  return (
-    <div className="container py-5">
-      <h2 className="fade-in mb-4">Tracker</h2>
-      {}
-      <div className="card fresh mb-4 p-4 fade-in">
-        <h5 className="mb-3" style={{color: '#2bb6a3'}}>
-           {form.id ? 'Edit Entry' : 'New Entry'}
-        </h5>
-        <form onSubmit={handleSubmit} className="row g-3 align-items-end">
-          <div className="col-md-3">
-            <label className="form-label small text-muted">Date</label>
-            <input name="date" type="date" value={form.date} onChange={handleInput} className="form-control" required />
-          </div>
-          <div className="col-md-3">
-            <label className="form-label small text-muted">Type</label>
-            <select name="type" value={form.type} onChange={handleInput} className="form-select">
-              <option>Exercise</option>
-              <option>Sleep</option>
-              <option>Water</option>
-              <option>Meal</option>
-              <option>Mood</option>
-            </select>
-          </div>
-          <div className="col-md-3">
-            <label className="form-label small text-muted">Value</label>
-            <input name="val" value={form.val} onChange={handleInput} className="form-control" placeholder="ex:, 30min, 2L" required />
-          </div>
-          <div className="col-md-3 d-flex gap-2">
-            <button className="btn btn-primary flex-grow-1" type="submit">
-               {form.id ? 'Update Log' : 'Add Log'}
-            </button>
-            {form.id && (
-                <button type="button" className="btn btn-outline-secondary" onClick={resetForm}>Cancel</button>
-            )}
-          </div>
-          <div className="col-12">
-            <label className="form-label small text-muted">Notes (Optional)</label>
-            <input name="notes" value={form.notes} onChange={handleInput} className="form-control" placeholder="How did you feel?" />
-          </div>
-        </form>
-      </div>
-      {}
-      <div className="d-flex justify-content-between align-items-center mb-3 fade-in">
-        <div className="small text-muted">Total Entries: <strong>{entries.length}</strong></div>
-        <select value={filter} onChange={(e)=>setFilter(e.target.value)} className="form-select form-select-sm w-auto">
-          <option value="all">All Types</option>
-          <option value="Exercise">Exercise</option>
-          <option value="Sleep">Sleep</option>
-          <option value="Water">Water</option>
-          <option value="Meal">Meal</option>
-          <option value="Mood">Mood</option>
-        </select>
-      </div>
-      <div className="card fresh p-0 overflow-hidden fade-in">
-        <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
-            <thead className="bg-light">
-              <tr>
-                <th className="ps-4">Date</th>
-                <th>Type</th>
-                <th>Value</th>
-                <th>Notes</th>
-                <th className="text-end pe-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(entry => (
-                <tr key={entry.id}>
-                  <td className="ps-4" style={{fontWeight: 500}}>{new Date(entry.date).toLocaleDateString()}</td>
-                  <td><span className="badge bg-light text-dark border px-3 py-2">{entry.type}</span></td>
-                  <td>{entry.val}</td>
-                  <td className="text-muted small text-truncate" style={{maxWidth: '200px'}}>{entry.notes}</td>
-                  {}
-                  <td className="text-end pe-4">
-                    <button
-                        className="btn btn-sm btn-outline-primary me-2"
-                        onClick={()=>handleEdit(entry)}
-                        title="Edit Entry"
-                    >
-                        <BsPencilSquare className="me-1"/> Edit
-                    </button>
-                    <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={()=>handleDelete(entry.id)}
-                        title="Delete Entry"
-                    >
-                        <BsTrash className="me-1"/> Delete
-                    </button>
-                  </td>
-
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan="5" className="text-center py-5 text-muted">No entries found. Start logging!</td></tr>
-              )}
-            </tbody>
-          </table>
+    const BACKEND_URL = "https://healthtrack-67vp.onrender.com";
+    useEffect(() => {
+        fetchActivities();
+    }, []);
+    const fetchActivities = () => {
+        axios.get(`${BACKEND_URL}/api/activities`)
+            .then(res => {
+                if(Array.isArray(res.data)) {
+                    setActivities(res.data);
+                } else {
+                    console.error("Data is not an array:", res.data);
+                }
+            })
+            .catch(err => console.error("Error fetching data:", err));
+    };
+    const handleInput = (event) => {
+        setValues(prev => ({...prev, [event.target.name]: event.target.value}));
+    }
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        axios.post(`${BACKEND_URL}/api/activities`, values)
+            .then(res => {
+                fetchActivities(); 
+                setValues({ ...values, val: '', notes: '' }); 
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error saving activity: " + err);
+            });
+    }
+    const handleDelete = (id) => {
+        axios.delete(`${BACKEND_URL}/api/activities/${id}`)
+            .then(() => fetchActivities())
+            .catch(err => alert("Error deleting: " + err));
+    }
+    return (
+        <div className="container py-5 fade-in">
+            <h2 className="mb-4">Tracker</h2>  
+            {}
+            <div className="card fresh p-4 mb-5">
+                <h5 className="text-success mb-3">New Entry</h5>
+                <form onSubmit={handleSubmit}>
+                    <div className="row g-3">
+                        <div className="col-md-3">
+                            <label className="form-label small text-muted">Date</label>
+                            <input type="date" name="date" className="form-control" value={values.date} onChange={handleInput} required />
+                        </div>
+                        <div className="col-md-3">
+                            <label className="form-label small text-muted">Type</label>
+                            <select name="type" className="form-select" value={values.type} onChange={handleInput}>
+                                <option>Exercise</option>
+                                <option>Sleep</option>
+                                <option>Water</option>
+                                <option>Meditation</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label small text-muted">Value (e.g., 30mins, 2 liters)</label>
+                            <input type="text" name="val" className="form-control" value={values.val} onChange={handleInput} required placeholder="Duration or amount" />
+                        </div>
+                        <div className="col-12">
+                            <label className="form-label small text-muted">Notes (Optional)</label>
+                            <input type="text" name="notes" className="form-control" value={values.notes} onChange={handleInput} placeholder="How did you feel?" />
+                        </div>
+                        <div className="col-12 text-end">
+                            <button type="submit" className="btn btn-success px-4">Add Log</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <span className="text-muted">Total Entries: {activities.length}</span>
+                <button className="btn btn-sm btn-outline-secondary" onClick={fetchActivities}>Refresh List</button>
+            </div>
+            <div className="card shadow-sm">
+                <div className="table-responsive">
+                    <table className="table table-hover align-middle mb-0">
+                        <thead className="bg-light">
+                            <tr>
+                                <th scope="col" className="ps-4">Date</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Notes</th>
+                                <th scope="col" className="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {activities.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-5 text-muted">
+                                        No entries found. Start logging!
+                                    </td>
+                                </tr>
+                            ) : (
+                                activities.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="ps-4">{item.date}</td>
+                                        <td><span className="badge bg-success bg-opacity-10 text-success">{item.type}</span></td>
+                                        <td>{item.val}</td>
+                                        <td className="text-muted small">{item.notes}</td>
+                                        <td className="text-end pe-4">
+                                            <button className="btn btn-sm btn-link text-danger" onClick={() => handleDelete(item.id)}>Delete</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 export default Tracker;
