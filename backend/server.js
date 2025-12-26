@@ -15,6 +15,19 @@ db.connect((err) => {
     if (err) console.log("Error connecting to DB:", err);
     else console.log("Connected to MySQL Cloud Database");
 });
+app.get('/fix-contacts-db', (req, res) => {
+    const sql = `CREATE TABLE IF NOT EXISTS contacts (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`;
+    db.query(sql, (err, result) => {
+        if(err) return res.json(err);
+        return res.json("Success! Contacts table created.");
+    });
+});
 app.get('/fix-db', (req, res) => {
     const sql = "ALTER TABLE activities ADD COLUMN time VARCHAR(20) AFTER date";
     db.query(sql, (err, result) => {
@@ -47,6 +60,18 @@ app.post('/login', (req, res) => {
         else return res.json("Fail");
     });
 });
+app.post('/contact', (req, res) => {
+    const sql = "INSERT INTO contacts (`name`, `email`, `message`) VALUES (?)";
+    const values = [req.body.name, req.body.email, req.body.message];
+    
+    db.query(sql, [values], (err, data) => {
+        if(err) {
+            console.error("Database Error:", err);
+            return res.json("Error");
+        }
+        return res.json("Message Sent");
+    });
+});
 app.get('/api/activities', (req, res) => {
     const sql = "SELECT * FROM activities ORDER BY date DESC, time DESC";
     db.query(sql, (err, data) => {
@@ -67,7 +92,6 @@ app.put('/api/activities/:id', (req, res) => {
     const sql = "UPDATE activities SET `type` = ?, `date` = ?, `time` = ?, `val` = ?, `notes` = ? WHERE id = ?";
     const values = [req.body.type, req.body.date, req.body.time, req.body.val, req.body.notes];
     const id = req.params.id;
-
     db.query(sql, [...values, id], (err, data) => {
         if(err) return res.json(err);
         return res.json("Updated");

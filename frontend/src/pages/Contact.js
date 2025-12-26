@@ -13,18 +13,22 @@ function Contact() {
     event.preventDefault();
     axios.post('https://healthtrack-67vp.onrender.com/contact', values)
       .then(res => {
-        if(res.data === "Success") {
+        if(res.data === "Message Sent") {
             alert("Message Sent Successfully!");
             setValues({name: '', email: '', message: ''}); 
         } else {
-            alert("Failed to send message");
+            console.error("Server Response:", res.data);
+            alert("Failed to send message. Please try again.");
         }
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+          console.error("Network Error:", err);
+          alert("Error connecting to server.");
+      });
   }
   return (
     <div className="container py-5 fade-in">
-      <div className="row justify-content-center">
+      <div className="row justify-content-center">  
         {}
         <div className="col-lg-5 mb-4">
           <div className="card h-100 border-0 shadow-sm p-4 text-white" style={{backgroundColor: '#2bb6a3'}}>
@@ -46,29 +50,29 @@ function Contact() {
         </div>
         {}
         <div className="col-lg-7">
-          <div className="card fresh p-5 h-100">
+          <div className="card fresh p-5 h-100 shadow-sm border-0">
             <h2 className="mb-4" style={{color: '#333'}}>Send us a Message</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Your Name</label>
+                  <label className="form-label small text-muted">Your Name</label>
                   <input 
                     type="text" 
                     name="name" 
                     className="form-control" 
-                    placeholder=""
+                    placeholder="Enter name"
                     value={values.name}
                     onChange={handleInput}
                     required 
                   />
                 </div>
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Your Email</label>
+                  <label className="form-label small text-muted">Your Email</label>
                   <input 
                     type="email" 
                     name="email" 
                     className="form-control" 
-                    placeholder=""
+                    placeholder="Enter email"
                     value={values.email}
                     onChange={handleInput}
                     required 
@@ -76,7 +80,7 @@ function Contact() {
                 </div>
               </div>
               <div className="mb-3">
-                <label className="form-label">Message</label>
+                <label className="form-label small text-muted">Message</label>
                 <textarea 
                   name="message" 
                   className="form-control" 
@@ -87,7 +91,7 @@ function Contact() {
                   required
                 ></textarea>
               </div>
-              <button type="submit" className="btn btn-primary w-100 py-2">
+              <button type="submit" className="btn btn-success w-100 py-2">
                 Send Message
               </button>
             </form>
