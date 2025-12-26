@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 function Tracker() {
     const [activities, setActivities] = useState([]);
+    const getCurrentTime = () => {
+        const now = new Date();
+        return now.toTimeString().slice(0, 5); 
+    };
     const [values, setValues] = useState({
         date: new Date().toISOString().split('T')[0], 
+        time: getCurrentTime(), 
         type: 'Exercise',
         val: '',
         notes: ''
@@ -32,8 +36,14 @@ function Tracker() {
             axios.put(`${BACKEND_URL}/api/activities/${editId}`, values)
                 .then(res => {
                     fetchActivities();
-                    setValues({ date: new Date().toISOString().split('T')[0], type: 'Exercise', val: '', notes: '' });
-                    setEditId(null); 
+                    setValues({ 
+                        date: new Date().toISOString().split('T')[0], 
+                        time: getCurrentTime(), 
+                        type: 'Exercise', 
+                        val: '', 
+                        notes: '' 
+                    });
+                    setEditId(null);
                 })
                 .catch(err => alert("Error updating: " + err));
         } else {
@@ -47,7 +57,8 @@ function Tracker() {
     }
     const handleEdit = (item) => {
         setValues({
-            date: item.date.split('T')[0], 
+            date: item.date.split('T')[0],
+            time: item.time || getCurrentTime(), 
             type: item.type,
             val: item.val,
             notes: item.notes
@@ -65,10 +76,13 @@ function Tracker() {
         if (!isoString) return "";
         return isoString.split('T')[0];
     };
+    const formatTime = (timeString) => {
+        if (!timeString) return "";
+        return timeString.slice(0, 5); 
+    };
     return (
         <div className="container py-5 fade-in">
-            <h2 className="mb-4">Tracker</h2>  
-            {}
+            <h2 className="mb-4">Tracker</h2>
             <div className="card fresh p-4 mb-5">
                 <h5 className="text-success mb-3">{editId ? "Edit Entry" : "New Entry"}</h5>
                 <form onSubmit={handleSubmit}>
@@ -77,6 +91,12 @@ function Tracker() {
                             <label className="form-label small text-muted">Date</label>
                             <input type="date" name="date" className="form-control" value={values.date} onChange={handleInput} required />
                         </div>
+                        {}
+                        <div className="col-md-2">
+                            <label className="form-label small text-muted">Time</label>
+                            <input type="time" name="time" className="form-control" value={values.time} onChange={handleInput} required />
+                        </div>
+                        {}
                         <div className="col-md-3">
                             <label className="form-label small text-muted">Type</label>
                             <select name="type" className="form-select" value={values.type} onChange={handleInput}>
@@ -87,7 +107,7 @@ function Tracker() {
                                 <option>Other</option>
                             </select>
                         </div>
-                        <div className="col-md-6">
+                        <div className="col-md-4">
                             <label className="form-label small text-muted">Value</label>
                             <input type="text" name="val" className="form-control" value={values.val} onChange={handleInput} required placeholder="e.g. 30mins" />
                         </div>
@@ -99,7 +119,13 @@ function Tracker() {
                             {editId && (
                                 <button type="button" className="btn btn-secondary me-2" onClick={() => {
                                     setEditId(null);
-                                    setValues({ date: new Date().toISOString().split('T')[0], type: 'Exercise', val: '', notes: '' });
+                                    setValues({ 
+                                        date: new Date().toISOString().split('T')[0], 
+                                        time: getCurrentTime(), 
+                                        type: 'Exercise', 
+                                        val: '', 
+                                        notes: '' 
+                                    });
                                 }}>Cancel</button>
                             )}
                             <button type="submit" className={`btn ${editId ? 'btn-warning' : 'btn-success'} px-4`}>
@@ -109,13 +135,13 @@ function Tracker() {
                     </div>
                 </form>
             </div>
-            {}
             <div className="card shadow-sm">
                 <div className="table-responsive">
                     <table className="table table-hover align-middle mb-0">
                         <thead className="bg-light">
                             <tr>
                                 <th scope="col" className="ps-4">Date</th>
+                                <th scope="col">Time</th> {}
                                 <th scope="col">Type</th>
                                 <th scope="col">Value</th>
                                 <th scope="col">Notes</th>
@@ -125,33 +151,22 @@ function Tracker() {
                         <tbody>
                             {activities.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="text-center py-5 text-muted">
+                                    <td colSpan="6" className="text-center py-5 text-muted">
                                         No entries found. Start logging!
                                     </td>
                                 </tr>
                             ) : (
                                 activities.map((item, index) => (
                                     <tr key={index}>
-                                        {}
                                         <td className="ps-4 fw-bold text-secondary">{formatDate(item.date)}</td>
+                                        {}
+                                        <td className="text-muted">{formatTime(item.time)}</td>
                                         <td><span className="badge bg-success bg-opacity-10 text-success">{item.type}</span></td>
                                         <td>{item.val}</td>
                                         <td className="text-muted small">{item.notes}</td>
                                         <td className="text-end pe-4">
-                                            {}
-                                            <button 
-                                                className="btn btn-sm btn-primary me-2" 
-                                                onClick={() => handleEdit(item)}
-                                            >
-                                                Edit
-                                            </button>
-                                            {}
-                                            <button 
-                                                className="btn btn-sm btn-danger" 
-                                                onClick={() => handleDelete(item.id)}
-                                            >
-                                                Delete
-                                            </button>
+                                            <button className="btn btn-sm btn-primary me-2" onClick={() => handleEdit(item)}>Edit</button>
+                                            <button className="btn btn-sm btn-danger" onClick={() => handleDelete(item.id)}>Delete</button>
                                         </td>
                                     </tr>
                                 ))
