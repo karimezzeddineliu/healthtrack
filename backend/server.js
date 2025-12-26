@@ -28,11 +28,10 @@ app.get('/users', (req, res) => {
 app.post('/signup', (req, res) => {
     const sql = "INSERT INTO login (`name`, `email`, `password`) VALUES (?)";
     const values = [req.body.name, req.body.email, req.body.password];
-
     db.query(sql, [values], (err, data) => {
         if(err) {
             console.error(err);
-            return res.json("Error");
+            return res.json(err); 
         }
         return res.json("User registered");
     });
@@ -69,6 +68,7 @@ app.get('/api/activities', (req, res) => {
 app.post('/api/activities', (req, res) => {
     const sql = "INSERT INTO activities (`type`, `date`, `val`, `notes`) VALUES (?)";
     const values = [req.body.type, req.body.date, req.body.val, req.body.notes];
+
     db.query(sql, [values], (err, data) => {
         if(err) return res.json("Error");
         return res.json(data);
@@ -78,6 +78,7 @@ app.put('/api/activities/:id', (req, res) => {
     const sql = "UPDATE activities SET `type` = ?, `date` = ?, `val` = ?, `notes` = ? WHERE id = ?";
     const values = [req.body.type, req.body.date, req.body.val, req.body.notes];
     const id = req.params.id;
+
     db.query(sql, [...values, id], (err, data) => {
         if(err) return res.json("Error");
         return res.json("Updated");
@@ -86,6 +87,7 @@ app.put('/api/activities/:id', (req, res) => {
 app.delete('/api/activities/:id', (req, res) => {
     const sql = "DELETE FROM activities WHERE id = ?";
     const id = req.params.id;
+
     db.query(sql, [id], (err, data) => {
         if(err) return res.json("Error");
         return res.json("Deleted");
