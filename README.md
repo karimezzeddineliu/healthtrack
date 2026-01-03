@@ -195,19 +195,19 @@ The React application runs on **port 3000**.
 ## 7. Screenshots
 
 ### Home Page
-![Home Page](docs/screenshots/home.png)
+![Home Page](frontend/docs/screenshots/home.png)
 
 ### Tracker Page
-![Tracker Page](docs/screenshots/tracker.png)
+![Tracker Page](frontend/docs/screenshots/tracker.png)
 
 ### Features Page
-![Features Page](docs/screenshots/features.png)
+![Features Page](frontend/docs/screenshots/features.png)
 
 ### About Page
-![About Page](docs/screenshots/about.png)
+![About Page](frontend/docs/screenshots/about.png)
 
 ### Contact Page
-![Contact Page](docs/screenshots/contact.png)
+![Contact Page](frontend/docs/screenshots/contact.png)
 ---
 
 ## 8. Git Commit History Guidelines
