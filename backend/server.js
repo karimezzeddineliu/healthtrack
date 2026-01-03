@@ -48,7 +48,12 @@ app.post('/signup', (req, res) => {
     const sql = "INSERT INTO login (`name`, `email`, `password`) VALUES (?)";
     const values = [req.body.name, req.body.email, req.body.password];
     db.query(sql, [values], (err, data) => {
-        if(err) return res.json(err);
+        if(err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.json("Email already exists");
+            }
+            return res.json(err);
+        }
         return res.json("User registered");
     });
 });

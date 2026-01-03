@@ -15,18 +15,20 @@ function Signup() {
         event.preventDefault();
         axios.post('https://healthtrack-67vp.onrender.com/signup', values)
             .then(res => {
-                // --- DEBUG: Alert backend response ---
-                alert("Backend said: " + JSON.stringify(res.data)); 
-                
                 if(res.data === "User registered") {
-                    navigate('/'); // Redirect to Login
-                } else {
+                    alert("Account created successfully! Redirecting to Login...");
+                    navigate('/login'); 
+                } 
+                else if (res.data === "Email already exists") {
+                    alert("This email is already registered. Please use a different email or try logging in.");
+                }
+                else {
                     alert("Signup Failed: " + JSON.stringify(res.data));
                 }
             })
             .catch(err => {
                 console.log(err);
-                alert("Error connecting to server: " + err);
+                alert("Error connecting to server. Please try again.");
             });
     }
     return (
@@ -69,7 +71,7 @@ function Signup() {
                             <button type="submit" className="btn btn-success w-100">Sign Up</button>
                         </form>
                         <p className="text-center mt-3 small">
-                            Already have an account? <Link to="/">Login</Link>
+                            Already have an account? <Link to="/login">Login</Link>
                         </p>
                     </div>
                 </div>
