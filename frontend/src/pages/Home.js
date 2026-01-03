@@ -8,10 +8,6 @@ function Home() {
       {}
       <section className="row align-items-center min-vh-75 py-5 fade-in">
         <div className="col-lg-6 mb-5 mb-lg-0">
-          <div className="d-inline-block px-3 py-1 mb-3 rounded-pill"
-               style={{background: 'rgba(43,182,163,0.1)', color: '#2bb6a3', fontSize: '0.85rem', fontWeight: 600}}>
-             New: Database Connected
-          </div>
           <h1 className="display-4 mb-3" style={{fontWeight: 800, letterSpacing: '-1px', color: '#1e293b'}}>
             Master Your Health <br />
             <span style={{
